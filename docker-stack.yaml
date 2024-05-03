@@ -1,0 +1,48 @@
+version: '3.9'
+ 
+services:
+  core:
+    image: neo4j:4.4-enterprise
+    networks:
+      neo4j-net:
+        aliases:
+          - lan
+    ports:
+      - 80:7474
+      - 6477:6477
+      - 7687:7687
+    volumes:
+       - ./neo4j.conf:/conf/neo4j.conf
+    environment:
+      - NEO4J_AUTH=neo4j/changeme
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - EXTENDED_CONF=yes
+      - NEO4J_dbms_mode=CORE
+    user: ${USER_ID}:${GROUP_ID}
+    deploy:
+      replicas: 3
+ 
+  replica:
+    image: neo4j:4.4-enterprise
+    networks:
+      neo4j-net:
+        aliases:
+          - lan
+    ports:
+      ports:
+      - 7475:7475
+      - 6478:6478
+      - 7688:7688
+    volumes:
+       - ./neo4j.conf:/conf/neo4j.conf
+    environment:
+      - NEO4J_ACCEPT_LICENSE_AGREEMENT=yes
+      - NEO4J_AUTH=neo4j/changeme
+      - EXTENDED_CONF=yes
+      - NEO4J_dbms_mode=READ_REPLICA
+    user: ${USER_ID}:${GROUP_ID}
+    deploy:
+      replicas: 3
+ 
+networks:
+  neo4j-net:
